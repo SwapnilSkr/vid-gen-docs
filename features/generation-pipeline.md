@@ -45,8 +45,11 @@ After all lines:
 
 ### 4.2 Overlay characters
 
-- Build `VideoSegment` objects per line and position.
-- Apply overlays with FFmpeg complex filters.
+- Build `VideoSegment` objects per line, including character image path, temporal range (`startTime` to `endTime`), and a normalized `IRequiredCharacterPosition`.
+- Apply overlays using FFmpeg's `overlay` filter with support for dynamic positioning:
+  - For `none` animation: Simple static `x:y` pixel coordinates.
+  - For `slide_in_left/right`: Complex if-then-else expressions that use the `t` (time) variable to interpolate `x` from off-screen to the target coordinate over `animationDuration`.
+- The filter is enabled using the `:enable='between(t,start,end)'` option.
 
 ### 4.3 Merge audio
 

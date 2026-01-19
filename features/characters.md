@@ -1,6 +1,6 @@
 # Characters
 
-Characters are avatar images with associated voice IDs. They are linked to templates and appear as overlays in compositions.
+Characters are avatar images with associated voice IDs. They are linked to templates and appear as overlays in compositions. Their appearance can be enhanced with customizable entry animations (e.g., slide-ins).
 
 ## Data Model
 

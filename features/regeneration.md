@@ -12,7 +12,7 @@ Regeneration reuses existing speech audio to avoid repeating TTS generation.
 - `screenType`: optional new screen type
 - `subtitlePosition`: optional new subtitle position
 - `subtitleAnimation`: optional new subtitle animation style
-- `characterPositions`: optional overrides
+- `characterPositions`: optional overrides (including scale, anchor, and animations)
 
 ## Flow
 

@@ -44,7 +44,9 @@ Source files: `server/src/types/guards/*`.
 - `CharacterPositionSchema`:
   - `x`, `y`: optional number (0-100)
   - `scale`: optional number (0.01-2)
-  - `anchor`: enum
+  - `anchor`: `top-left | top-right | bottom-left | bottom-right | center`
+  - `animation`: optional `none | slide_in_left | slide_in_right`
+  - `animationDuration`: optional number (0.1 - 3.0 seconds)
 
 - `CreateCompositionBody`:
   - `templateId`: string
