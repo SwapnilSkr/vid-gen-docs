@@ -9,7 +9,7 @@
 - intermediate FFmpeg outputs
 - temporary ASS subtitle files
 
-These files are cleaned up at the end of each pipeline run.
+These files are cleaned up at the end of each pipeline run. The cleanup mechanism ensures that even on failure, local assets like speech audio and intermediate video tracks are unlinked to prevent disk bloat.
 
 ## S3 Layout
 

@@ -29,7 +29,13 @@ For each line:
 
 - Generate speech audio using `generateSpeech`.
 - Upload to S3 and store `speechUrl`.
-- Update line duration based on actual audio length.
+- An `AudioSegment` object is created containing:
+  - `characterId`: ID of the speaking character.
+  - `text`: Dialogue text.
+  - `audioPath`: Local path to the generated MP3.
+  - `speechUrl`: S3 URL for persistence.
+  - `startTime` & `duration`: Temporal markers.
+- Update line duration in the database based on actual audio length.
 
 After all lines:
 
@@ -45,7 +51,8 @@ After all lines:
 
 ### 4.2 Overlay characters
 
-- Build `VideoSegment` objects per line, including character image path, temporal range (`startTime` to `endTime`), and a normalized `IRequiredCharacterPosition`.
+- Build `VideoSegment` objects per line using the previously generated `AudioSegment` list.
+- Includes character image path, temporal range (`startTime` to `endTime`), and a normalized `IRequiredCharacterPosition`.
 - Apply overlays using FFmpeg's `overlay` filter with support for dynamic positioning:
   - For `none` animation: Simple static `x:y` pixel coordinates.
   - For `slide_in_left/right`: Complex if-then-else expressions that use the `t` (time) variable to interpolate `x` from off-screen to the target coordinate over `animationDuration`.
@@ -53,7 +60,7 @@ After all lines:
 
 ### 4.3 Merge audio
 
-- Mix all dialogue audio tracks (and reduce template audio if present).
+- Mix all dialogue audio tracks from the `AudioSegment` list (and reduce template audio if present).
 
 ### 4.4 Generate subtitles
 
@@ -69,9 +76,14 @@ After all lines:
 ## 5) Upload and Cleanup
 
 - Upload final video to S3.
-- Delete all temporary processing files.
+- Delete all temporary processing files (audio segments, intermediate video tracks).
 - Update Composition status to `completed`.
 
-## Error Handling
+## Error Handling & Asset Cleanup
 
-Errors are caught at the pipeline level and written to the Composition record with status `failed`.
+The pipeline implements robust error handling to ensure orphaned local files are removed even on failure:
+
+1.  **Pipeline-Level Catch**: Errors caught in `processComposition` or `regenerateCompositionAsync` trigger a cleanup of all local `AudioSegment` files.
+2.  **Helper-Level Catch**: Inside `processVideoWithAudioAndSubtitles`, a recursive `tempFiles` tracker is used. If any intermediate FFmpeg step fails (aspect correction, overlays, audio merging), all files generated _up to that point_ are immediately unlinked from the local disk.
+3.  **Status Update**: The Composition record is updated with status `failed` and the error message is stored in the `error` field for diagnosis.
+4.  **S3 Resilience**: During regeneration, if old S3 assets exist for that composition, they are deleted before the new ones are uploaded to save storage costs.
