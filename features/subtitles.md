@@ -10,9 +10,12 @@ Implemented in `server/src/services/subtitle.service.ts`.
 2. Assign each chunk a duration: `dialogue.duration / chunks.length`.
 3. Multiply chunk duration by `chunkSpeedMultiplier` to increase speed.
 4. Split each chunk into words.
-5. Create an ASS dialogue line for each word:
-   - Active word uses secondary color
-   - Other words use primary color
+5. Apply animation based on `subtitleAnimation` (default: `none`):
+   - `none`: Color change only (active word uses secondary color).
+   - `pop`: Active word scales up (120%) then back down.
+   - `shake`: Active word rotates ±8° left/right.
+   - `reel`: Active word slides in from the left with a fade-in.
+6. Create an ASS dialogue line for each word.
 
 ## ASS Header
 

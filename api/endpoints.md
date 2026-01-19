@@ -56,7 +56,7 @@ Responses use the shape:
 ## Compositions (Primary)
 
 - `POST /api/compositions`
-  - JSON body: `{ templateId, plot, title?, screenType?, subtitlePosition?, characterPositions? }`
+  - JSON body: `{ templateId, plot, title?, screenType?, subtitlePosition?, subtitleAnimation?, characterPositions? }`
 
 - `GET /api/compositions`
   - Query: `limit` (default 50)
@@ -66,7 +66,7 @@ Responses use the shape:
 - `GET /api/compositions/:id/download`
 
 - `POST /api/compositions/:id/regenerate`
-  - JSON body: `{ delays?, screenType?, subtitlePosition?, characterPositions? }`
+  - JSON body: `{ delays?, screenType?, subtitlePosition?, subtitleAnimation?, characterPositions? }`
 
 ## Generate (Alias)
 

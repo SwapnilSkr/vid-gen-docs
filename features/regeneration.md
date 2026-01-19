@@ -11,6 +11,7 @@ Regeneration reuses existing speech audio to avoid repeating TTS generation.
 - `delays`: optional array of per-line delays (seconds)
 - `screenType`: optional new screen type
 - `subtitlePosition`: optional new subtitle position
+- `subtitleAnimation`: optional new subtitle animation style
 - `characterPositions`: optional overrides
 
 ## Flow

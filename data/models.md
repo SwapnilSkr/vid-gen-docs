@@ -43,6 +43,7 @@ Fields:
 - `characterPositions` (Map of `characterId -> position`)
 - `generatedScript` (array of dialogue lines)
 - `subtitlePosition` (`top | center | bottom`)
+- `subtitleAnimation` (`none | pop | shake | reel`)
 - `status` (`pending`, `generating_script`, `generating_audio`, `compositing`, `completed`, `failed`)
 - `progress` (0-100)
 - `outputUrl` (string, optional)
