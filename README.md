@@ -43,3 +43,4 @@ This folder documents the video template generation API in the `server/` package
 - **Docker**: [docs/operations/docker.md](operations/docker.md)
 - **Storage layout**: [docs/operations/storage.md](operations/storage.md)
 - **Testing and diagnostics**: [docs/operations/testing.md](operations/testing.md)
+- **Scheduling (cron jobs)**: [docs/operations/scheduling.md](operations/scheduling.md)

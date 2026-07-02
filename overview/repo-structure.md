@@ -1,11 +1,14 @@
 # Repository Structure
 
-This repository contains a backend API in `server/` and documentation in `docs/`.
+This repository contains a backend API in `server/`, a review frontend in
+`client/`, and documentation in `docs/`.
 
 ## Top-Level
 
 - `README.md`: project summary and quick start
 - `server/`: Bun + Elysia API
+- `client/`: Vite + React review studio for reel creation, preview, metadata,
+  thumbnail review, download, and YouTube publish actions
 - `docs/`: detailed architecture and feature documentation
 
 ## Server Structure (`server/src`)

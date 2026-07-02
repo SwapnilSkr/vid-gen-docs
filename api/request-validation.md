@@ -61,3 +61,13 @@ Source files: `server/src/types/guards/*`.
   - `screenType`: optional `mobile | desktop`
   - `subtitlePosition`: optional `top | center | bottom`
   - `characterPositions`: optional record of `characterId -> position`
+
+## Reels
+
+- `CreateReelBody`:
+  - `niche`: string
+  - `genre`: optional string
+  - `topic`: optional string
+  - `tier`: optional `cheap | value | premium`
+  - `source`: optional `llm | hybrid | verbatim`
+  - `parts`: optional `off | auto | number`
