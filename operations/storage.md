@@ -19,7 +19,8 @@ The S3 bucket stores canonical assets by prefix:
 - `characters/` (character images)
 - `audio/` (speech audio clips)
 - `subtitles/` (ASS/SRT files)
-- `compositions/` (final videos)
+- `compositions/` (composition output videos)
+- `reels/` (generated reel output videos)
 
 ## Naming
 
