@@ -39,15 +39,32 @@ Per video ≈ **$0.0005–0.002**. Negligible. Registry default: `deepseek-v4-fl
 
 ## 3. TTS — quality is basically free, upgrade away from Kokoro
 
-| Model | $/Mtok | Quality | Format | Use |
-|---|---|---|---|---|
-| `hexgrad/kokoro-82m` | 0.0006 | robotic (you flagged this) | mp3 | kept only as an override/fallback |
-| **`google/gemini-3.1-flash-tts`** ⭐ | 0.001→0.02 | natural (Charon/Puck/Zephyr) | **pcm** (auto-converted) | `cheap` + `value` default |
-| `canopylabs/orpheus-3b` | 0.007 | expressive, emotive tags | mp3 | horror/drama |
-| `mistralai/voxtral-mini-tts` | 0.016 | emotional (paul voices) | mp3 | drama |
-| `microsoft/mai-voice-2` | 0.022 | high-quality, multilingual | mp3 | `premium` |
+Registry default (`resolveModels(tier).tts`) is unchanged from below — Gemini
+Flash TTS for cheap/value, MAI-Voice-2 for premium. What's new (2026-07-02):
+the **revoice/create-time voice picker** exposes a much wider catalog than
+just the tier defaults — `config/models.ts` `TTS_VOICE_CATALOG`, **40 voices
+across 5 providers, every one live-tested** against OpenRouter's
+`/audio/speech` endpoint (not just sourced from docs):
 
-Per video (~700 chars) = **~$0.00002 even on the priciest**. Listen & pick: `docs/samples/tts/`. Default has moved off Kokoro to **Gemini Flash TTS** because the cost delta is a rounding error and the Reddit output was audibly too robotic.
+| Model | Voices exposed | Notes |
+|---|---|---|
+| **`google/gemini-3.1-flash-tts-preview`** ⭐ | 10 (Charon, Puck, Zephyr, Kore, Fenrir, Leda, Orus, Aoede, Autonoe, Sulafat) | **pcm** (auto-converted). `cheap`+`value` default. |
+| `hexgrad/kokoro-82m` | 10 English (5 US male, 3 US female, 1 UK male, 1 UK female) | mp3. Robotic delivery — kept for variety/fallback, not the default. |
+| `microsoft/mai-voice-2` | 7 English (6 US, 1 AU) | mp3. `premium` default (Harper). |
+| `canopylabs/orpheus-3b-0.1-ft` | 8 (tara, leah, jess, mia, zoe, leo, dan, zac) | mp3. Supports `<laugh>`/`<sigh>`/`<gasp>` emotive tags **in the narration text itself** — good fit for horror/drama. |
+| `x-ai/grok-voice-tts-1.0` | 5 (Eve, Ara, Rex, Sal, Leo) | mp3. |
+
+**Tried and dropped** (400 "model does not exist" on OpenRouter despite being
+publicly listed — likely gated/region-locked, re-test before re-adding):
+`mistralai/voxtral-mini-tts[-2603]`, `openai/gpt-4o-mini-tts[-2025-12-15]`.
+
+**Sample preview**: `GET /api/tts-voices/sample?model=&voice=` generates a
+short fixed line once per voice and caches it forever in S3 (`voice-samples/`
+folder) — click-to-preview in the UI, no repeat cost.
+
+Per video (~700 chars) = **~$0.00002 even on the priciest**. Default has
+moved off Kokoro to **Gemini Flash TTS** because the cost delta is a
+rounding error and the Reddit output was audibly too robotic.
 
 ## 4. Hero video (Wave 3+, the one real expense) — per second
 

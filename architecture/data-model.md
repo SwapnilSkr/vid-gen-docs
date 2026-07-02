@@ -2,6 +2,25 @@
 
 _The generalized model that replaces the brainrot-only `Composition`. This is the hardest thing to change later, so it's specced before code._
 
+> **⚠️ As-built correction (2026-07-02):** the model below was the pre-code
+> target spec. What actually shipped is named `Reel`, not `VideoProject`, and
+> the shape diverged in a few places — no `FormatRecipe` Mongo collection
+> exists (niche config lives in code, `server/src/config/niche-styles.ts`,
+> not the DB); no `Asset`/`CostLedger` collections exist yet; `TrendReference`
+> **is built** (not just planned) and has more fields than shown here
+> (`externalId`, `channelTitle`, `dayOfWeek`/`hourUtc`, `scanWindow` — see
+> `trend-reference.model.ts`), plus a companion `TrendInsight` collection this
+> doc doesn't mention at all. See `server/src/models/reel.model.ts` for the
+> real, current shape: `IReel` has `niche, topic, strategy, style, tier,
+> scenes[], redditStory?, gameplayKey?, voiceOverride?, voiceVariants[],
+> status, progress, outputUrl?, review?, youtube?` — narration/motion/caption
+> fields nest under `IScene` roughly as spec'd below, but `assetType` is
+> actually inferred from `strategy`, not stored per-scene, and there's no
+> `recipe: ObjectId` FK — `niche` is a plain string looked up in the code
+> registry. The rest of this doc is the original design intent, kept for
+> context on *why* the shape looks the way it does; treat the field names as
+> historical, not current.
+
 ---
 
 ## 1. Why change
