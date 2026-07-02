@@ -2,6 +2,27 @@
 
 _Synthesized June 2026 from: codebase audit + 3 research streams (market teardown, trend/format map, generation stack & costs)._
 
+> **⚠️ Provider routing in §1–2 below is superseded.** This doc's original
+> assumption (fal.ai primary, Inworld/ElevenLabs TTS) was corrected shortly
+> after: **OpenRouter is the single provider** for LLM + images + TTS + video
+> (`config/models.ts`, `resolveModels(tier)`). See
+> [DECISIONS.md](DECISIONS.md) #9–14 for the current, accurate stack — the
+> pricing tables below are the *pre-correction* numbers, kept for the
+> original cost-modeling logic, not as a current price sheet.
+>
+> **Phase status as of 2026-07-02** (see §5 below for the original plan):
+> Phase 0 (queue + scene graph + `GameplayOverlayStrategy`) — **done**.
+> Phase 1 (Reddit shipped; facts/motivation niches — not built, `image_kenburns`
+> strategy exists and could carry them but no recipe/planner work done yet).
+> Phase 2 (`hybrid_scene`/`motion_graphics` strategies, horror/mythology/finance/
+> movie-recap) — **not built**; `niche-styles.ts` already has recipes for
+> horror/mythology/dark_history/finance/etc. declared, but their render
+> strategies don't exist yet (only `image_kenburns` and `gameplay_overlay` are
+> implemented). Phase 3 (cost ledger) — not built. Phase 4 (distribution) —
+> YouTube Shorts publish **is built** (`youtube-publish.service.ts`), Instagram
+> still deferred. Phase 5 (trend agent) — **built**: `trend-scout.service.ts`
+> + `trend-insight.service.ts`, see DECISIONS.md #38–40.
+
 ---
 
 ## 0. The Bet (positioning)
@@ -108,14 +129,20 @@ Pipeline (BullMQ + Redis, each stage idempotent & resumable):
 
 ## 5. Phased Roadmap
 
-- **Phase 0 — Foundation refactor:** BullMQ+Redis queue; provider abstraction (Image/Video/TTS/LLM); generalize data model to scene graph; refactor current pipeline into `GameplayOverlayStrategy`. _No new features — make the seams._
-- **Phase 1 — Cheap engine + Wave-1 niches:** scene-planner LLM, fal image provider, Inworld TTS, `ImageSlideshowKenBurnsStrategy`, caption-skin system. Ship Reddit + facts + motivation.
-- **Phase 2 — Styles + Wave-2/3 niches + hero shots:** style rotation, `HybridSceneStrategy` with fal Kling/Veo hero clips, motion-graphics for finance. Add dark history, finance, horror, mythology, movie-recap.
-- **Phase 3 — Cost transparency:** ledger, pre-estimate, refund-on-failure, FormatRecipe admin.
-- **Phase 4 — Distribution (deferred research):** YouTube Data API + Instagram Graph API auto-post + scheduler. _The competitive wedge._
-- **Phase 5 — Trend agent + reference DB:** automated trend scraper → `TrendReference` collection feeding recipe tuning.
+- **Phase 0 — Foundation refactor** ✅ **done**: BullMQ+Redis queue; provider abstraction (OpenRouter, not fal — see routing note above); scene-graph data model shipped as `Reel`, not `VideoProject`; current pipeline is `gameplay_overlay` strategy.
+- **Phase 1 — Cheap engine + Wave-1 niches** 🟡 **partial**: scene-planner LLM + `image_kenburns` (renamed from `ImageSlideshowKenBurnsStrategy`) both shipped. Reddit is fully built and is the only Wave-1 niche actually shipped — facts/motivation have no recipe/planner work done, though `niche-styles.ts` + `image_kenburns` could carry them with recipe work only, no new pipeline code.
+- **Phase 2 — Styles + Wave-2/3 niches + hero shots** 🔴 **not built**: `niche-styles.ts` already declares recipes for dark_history/finance/stoicism/horror/mythology/movie_recap (styles, caption skins, voice overrides all specified), but their render strategies (`hybrid_scene` for hero shots, `motion_graphics` for finance) don't exist — only `image_kenburns` and `gameplay_overlay` are implemented. This is the next real gap for any non-Reddit niche.
+- **Phase 3 — Cost transparency** 🔴 **not built**: no `CostLedger` collection, no pre-estimate, no refund-on-failure UX.
+- **Phase 4 — Distribution** 🟡 **partial**: YouTube Shorts auto-post is **built and live** (`youtube-publish.service.ts`, wired into the review UI's Publish button). Instagram Reels still deferred (needs Business account + FB app review).
+- **Phase 5 — Trend agent + reference DB** ✅ **done**: `trend-scout.service.ts` (YouTube Data API scraper) + `trend-insight.service.ts` (digest for prompts) + `/trends` dashboard. See [DECISIONS.md](DECISIONS.md) #38–40.
 
 ---
 
 ## 6. Immediate next step
-Start **Phase 0**. Recommended first slice: stand up Redis+BullMQ and refactor `processComposition` into a staged, queued pipeline behind a `RenderStrategy` interface — with the existing brainrot path as `GameplayOverlayStrategy` so nothing regresses while the seams go in.
+
+~~Start Phase 0.~~ **Phase 0 is done** (see §5 status above). As of 2026-07-02
+the highest-leverage next step is **Phase 2**: pick one non-Reddit niche
+already declared in `niche-styles.ts` (dark_history is the cheapest —
+`image_kenburns` already supports it, no new strategy needed, just recipe +
+planner validation) and ship it end-to-end, before building the harder
+`hybrid_scene`/`motion_graphics` strategies horror/finance need.
