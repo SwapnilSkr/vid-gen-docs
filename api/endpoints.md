@@ -97,6 +97,10 @@ Responses use the shape:
     to use instead of a random pick from the pool. The resolved key is always
     recorded on the reel as `gameplayKey` (random or explicit), so revoice
     reuses the same clip.
+    `ttsModel`/`ttsVoice`/`ttsFormat` are optional — an explicit voice pick
+    from `GET /api/tts-voices`, overriding the tier default and any niche
+    voice override (precedence: tier default < niche override < this).
+    Recorded as `reel.voiceOverride`.
 
 - `GET /api/reels`
   - Query: `limit` (default 50)
