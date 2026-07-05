@@ -43,7 +43,7 @@ This repository contains a backend API in `server/`, a review frontend in
 One-off/cron entrypoints — see [operations/scheduling.md](../operations/scheduling.md)
 for what runs on what cadence: `topup-stories.ts`, `trend-scout-backfill.ts`,
 `trend-scout-daily.ts`, `refresh-trend-insights.ts`, `reconcile-s3.ts`,
-`fetch-gameplay.ts`, `ingest-gameplay.ts`, `youtube-authorize.ts`.
+`fetch-gameplay.ts`, `fetch-fonts.ts`, `ingest-gameplay.ts`, `youtube-authorize.ts`.
 
 ## Non-Code Assets
 
