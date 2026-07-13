@@ -11,6 +11,7 @@ Config source: `server/src/config/index.ts`.
 ## MongoDB
 
 - `MONGODB_URI` (default: `mongodb://localhost:27017/video-generator`)
+- `OPERATION_LOG_RETENTION_DAYS` (default: `30`) — TTL retention for Mongo-backed API/worker/fallback logs
 
 ## AWS S3
 

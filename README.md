@@ -8,6 +8,7 @@ This folder documents the video template generation API in the `server/` package
 - **Tech stack**: [docs/overview/tech-stack.md](overview/tech-stack.md)
 - **Repo structure**: [docs/overview/repo-structure.md](overview/repo-structure.md)
 - **Architecture overview**: [docs/architecture.md](architecture.md)
+- **Destination output/publish state contract**: [docs/architecture/destination-output-state.md](architecture/destination-output-state.md)
 
 ## Features
 
@@ -38,6 +39,8 @@ This folder documents the video template generation API in the `server/` package
 
 ## Operations
 
+- **System sanity audit (2026-07-13)**: [docs/audits/system-sanity-2026-07-13.md](audits/system-sanity-2026-07-13.md)
+- **Operations logging**: [docs/operations/observability.md](operations/observability.md)
 - **Configuration and env vars**: [docs/operations/configuration.md](operations/configuration.md)
 - **Local development**: [docs/operations/local-dev.md](operations/local-dev.md)
 - **Docker**: [docs/operations/docker.md](operations/docker.md)
