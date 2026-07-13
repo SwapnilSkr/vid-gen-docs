@@ -16,6 +16,18 @@ Responses use the shape:
 - `GET /`
   - Returns API info and usage hints
 
+## Operations
+
+- `GET /api/operations`
+  - Query: `limit` (1–100), `before` (ISO timestamp), `level`, `scope`, `reelId`.
+  - Returns redacted persistent backend API/queue/worker/provider log entries and an optional `nextBefore` cursor.
+- `DELETE /api/operations/:id`
+  - Permanently deletes one operation log entry.
+- `DELETE /api/operations`
+  - JSON body: `{ ids: ["..."] }` (up to 100). Permanently deletes selected entries.
+- `DELETE /api/operations/all`
+  - Permanently deletes every Operations entry. Successful Operations reads/deletes are not logged, so this can leave the collection empty.
+
 ## Templates
 
 - `POST /api/templates`
@@ -147,8 +159,9 @@ Responses use the shape:
     for each variant's `status` (`pending` → `ready`/`failed`) and `videoUrl`.
 
 - `POST /api/reels/:id/revoice/:variantId/promote`
-  - Sets `reel.outputUrl` to a `ready` voice variant's video, making it the
-    reel's primary output (used for publish/download).
+  - Promotes a ready voice variant as the shared body and queues an outro-only
+    rebuild. Every configured channel receives a fresh channel-specific final;
+    the raw variant itself is never publishable.
 
 - `DELETE /api/reels/:id`
 

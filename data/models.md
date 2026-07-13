@@ -2,6 +2,24 @@
 
 This file documents the MongoDB schemas defined in `server/src/models`.
 
+## OperationLog
+
+Schema: `server/src/models/operation-log.model.ts`
+
+Bounded, redacted operational telemetry used by the in-app **Operations** screen. It is intentionally distinct from a compliance audit trail.
+
+- `requestId` (string, optional) — correlates an API response's `X-Request-Id` to its log entry
+- `level` (`debug | info | warn | error`)
+- `scope` (`api | queue | worker | external | system`)
+- `event`, `message` (strings)
+- `method`, `path`, `status`, `durationMs` (optional HTTP context)
+- `reelId`, `jobId` (optional correlation context)
+- `metadata` and normalized `error` (bounded and redacted)
+- `expiresAt` (TTL index, controlled by `OPERATION_LOG_RETENTION_DAYS`)
+- `createdAt`, `updatedAt`
+
+Indexes support recent severity filtering and reel-specific investigation. See [Operations logging](../operations/observability.md) for retention, redaction, and deletion behavior.
+
 ## Character
 
 Schema: `server/src/models/character.model.ts`
