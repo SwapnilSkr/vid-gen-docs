@@ -139,6 +139,17 @@ Responses use the shape:
     uploads it, and returns the updated review package. Falls back to the
     original flat mockup design if image generation fails.
 
+- `POST /api/reels/:id/review/copy`
+  - Generates a new YouTube Shorts title and description from the reel source.
+  - Preserves upload tags, thumbnail, Instagram caption, destination state, and
+    rendered media. Its LLM receipt is appended to the reel cost breakdown.
+
+- `POST /api/reels/:id/instagram-caption`
+  - Generates a new platform-specific Instagram caption from the reel's source
+    material. It does not modify the YouTube review package or render media.
+  - Returns the updated reel with `instagramSettings.caption`, provenance, and
+    model. The LLM receipt is appended to the reel cost breakdown.
+
 - `POST /api/reels/:id/review/thumbnail/frame`
   - JSON body: `{ atSeconds }` — extracts that frame from the rendered video
     (`reel.outputUrl`), uploads it, and sets it as the review thumbnail

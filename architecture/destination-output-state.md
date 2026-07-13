@@ -21,10 +21,49 @@ The only valid output selector is the tuple **`platform + channelId`**. `resolve
 | `reel.review.title`, `description`, `tags`, and thumbnail | YouTube review package | YouTube Shorts only |
 | `reel.instagramSettings.caption` and `shareToFeed` | Instagram settings | Instagram Reels only |
 
-Instagram does not inherit the YouTube description/title. An absent or empty
-Instagram caption is intentionally published as empty; it is not a signal to
-reuse YouTube copy. The Studio saves the two field sets through separate API
-calls and the Instagram worker records `publish.instagram_caption_selected`.
+Instagram does not inherit the YouTube description/title. The normal review
+package creates a separate AI Instagram caption from the story material, with
+an Instagram-specific hook, framing, CTA, and 3–5 tags. Its LLM receipt is
+appended to the reel cost ledger. Existing reels can regenerate that caption
+through the paid Studio action; it changes only `instagramSettings` and no
+rendered output or YouTube field. A manual edit changes its provenance to
+`manual`, so it is never silently overwritten by later YouTube edits.
+
+An absent or intentionally empty saved Instagram caption blocks an Instagram
+publish before a job is queued. The Studio saves the two field sets through
+separate API calls and the Instagram worker records
+`publish.instagram_caption_selected` with only its length and hashtag count.
+Instagram captions are a product-capped field: no more than five hashtag
+occurrences (including repeated tags) may be saved or published.
+
+The paid **Regenerate AI title & description** action changes only
+`reel.review.title` and `reel.review.description`. It deliberately preserves
+upload tags, thumbnail artwork, Instagram caption, destination outputs, and
+the rendered video; its LLM receipt is added to the same reel cost ledger.
+
+AI metadata has a platform contract rather than one shared copy format:
+
+- **YouTube Shorts:** a clean, hashtag-free headline and concise searchable
+  description. The server appends at most five valid YouTube-style hashtags as
+  the description's final line; upload tags remain separate YouTube metadata.
+- **Instagram Reels:** 2–3 short conversational paragraphs, then 3–5
+  lower-case, story-specific Instagram hashtags on one final line. Generic
+  discovery tags such as `#fyp`, `#viral`, `#reels`, and `#shorts` are removed.
+
+Studio tracks unsaved YouTube copy, upload tags, Instagram caption, and
+Instagram feed-sharing independently. Polling or an AI action for one platform
+may only update the fields it owns; it cannot silently replace a pending draft
+for another platform.
+
+## Publishing-metadata save contract
+
+The Studio displays **Saved** only after two confirmations: the typed backend
+mutation returns the requested metadata and a no-cache `GET /status` reads the
+same values back from MongoDB. A mismatch is surfaced as an error and cannot be
+reported as saved. The publish confirmation uses this exact verified-write path
+before it queues an upload. The settings request schema explicitly owns the
+`instagram` object, and backend Operations records redacted save events for
+both YouTube review metadata and Instagram publish metadata.
 
 ## State transitions
 
@@ -65,4 +104,7 @@ YouTube state is still stored in the single legacy `reel.youtube` object. The ac
 6. Remove a destination, then run S3 reconciliation: its media is deleted; a remaining destination's media remains referenced.
 7. Edit captions, then try to publish before the rebuild completes: every selected account is rejected with HTTP 409 and no provider request.
 8. Promote a voice variant with two destinations: both old finals are invalidated, the queued outro-only pass produces two channel-specific finals, and neither provider can receive the raw variant.
-9. Edit and save the YouTube description, then publish to Instagram: the Graph request receives only the previously saved Instagram caption (or an empty caption), never the YouTube description.
+9. Create a review package: it produces an independent AI Instagram caption from the source story, records an `Instagram caption` LLM line in the cost breakdown, labels the field `ai`, and never changes the YouTube review fields.
+10. Regenerate an Instagram caption: only `instagramSettings.caption`/provenance changes; the video, destination outputs, and all YouTube metadata remain unchanged. A manual caption edit labels it `manual`.
+11. Edit and save the YouTube description, then publish to Instagram: the Graph request receives only the previously saved non-empty Instagram caption, never the YouTube description. An absent/empty caption or one with more than five hashtag occurrences returns HTTP 400 and creates no queue job/provider request.
+12. Regenerate YouTube Shorts copy: title and description change, its LLM cost line is appended, and tags, thumbnail, Instagram caption, destinations, and rendered media remain identical.
