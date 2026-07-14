@@ -150,6 +150,28 @@ Responses use the shape:
   - Returns the updated reel with `instagramSettings.caption`, provenance, and
     model. The LLM receipt is appended to the reel cost breakdown.
 
+- `POST /api/reels/:id/outro/comment-prompt`
+  - Available for `plan_review` and `completed` reels. Generates a short,
+    story-and-part-specific branded-outro question using the cheap LLM.
+  - Optional JSON body: `{ scope?: "primary" | "inheriting" | "all" }`.
+    `primary` preserves existing extra-channel questions, `inheriting` updates
+    only blank/inheriting extra drafts, and `all` deliberately replaces every
+    destination's question with the new story-specific copy.
+  - Appends its actual LLM receipt to the cost breakdown immediately. It does
+    not touch story scenes, gameplay, or body narration. On a completed reel it
+    invalidates only the primary output and extra destinations that inherit the
+    primary blank prompt; an optional `outro_only` rerender then uses the cached
+    body and skips ready explicit-override destinations.
+
+- `POST /api/reels/:id/destinations/primary`
+  - JSON body: `{ platform, channelId, previousPrimary: "keep" | "remove",
+    scope: "reel" | "series" }`.
+  - Promotes a connected account as the one required primary destination. With
+    `keep`, the former primary becomes an extra destination and keeps its own
+    output/audio. With `remove`, only that former primary's media for the
+    selected reel or series is reclaimed from S3. Neither choice deletes or
+    disconnects the globally connected social account.
+
 - `POST /api/reels/:id/review/thumbnail/frame`
   - JSON body: `{ atSeconds }` — extracts that frame from the rendered video
     (`reel.outputUrl`), uploads it, and sets it as the review thumbnail
@@ -212,6 +234,11 @@ variants) plus the BullMQ job. It can't catch assets that were uploaded and
 then the process crashed/stalled before the URL was ever saved to Mongo —
 that's what the reconciliation sweep below is for. See also
 `scripts/reconcile-s3.ts` (same logic, cron-friendly, dry-run by default).
+Before deleting a Reddit reel, the service upserts durable `Story` source
+history (including older manually pasted/replanned reels). This retains no S3
+media and is separate from user-clearable Operations telemetry; Browse and
+pasted-link duplicate checks therefore continue to reject a story that has
+already been produced after its reel record is gone.
 
 - `GET /api/maintenance/s3-reconcile`
   - Query: `apply?` = `"true"` to actually delete (default: dry run, report only).

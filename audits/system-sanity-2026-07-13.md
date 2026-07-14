@@ -50,6 +50,32 @@ This audit adds durable operations logging and fixes several confirmed reliabili
 | FIN-001 | TTS spend disappeared when OpenRouter’s generation receipt lagged. | Cost totals were understated. | Uses provider model pricing for a labelled estimate, preserves actual receipts where available, and historical affected reels were backfilled. |
 | SEC-001 | Reddit share-link resolution had server-side fetch exposure. | SSRF risk through off-site redirects. | Verified the resolver now restricts initial and redirected URLs to approved Reddit hosts. |
 
+## Follow-up implementation — 2026-07-14
+
+The following fixes close two related state-ownership gaps found while using
+the new branded-outro workflow. They are part of the same reliability work,
+not a separate visual-only redesign.
+
+| ID | Finding | Failure avoided | Implemented contract |
+| --- | --- | --- | --- |
+| DST-001 | The primary brand form and the multi-destination list were separate UI surfaces, so global story copy, per-account card fields, rendered media, and primary switching looked like unrelated controls. | A creator could save/render the wrong account state or assume a primary account could be deleted without knowing what media would be reclaimed. | Studio now has one destination-first Outro panel for every strategy: a global story discussion question, then one required primary account and expandable per-account cards. Each card owns only its own identity/CTA/card fields/output. |
+| DST-002 | Regenerating the question did not let a creator explicitly choose whether existing destination drafts should follow the new generation. | A global copy change could unexpectedly disturb a channel-specific draft, or leave the creator unable to refresh all channel outros intentionally. | `primary`, `inheriting`, and `all` scopes are server-enforced. The LLM receipt is recorded immediately; plan-review regeneration is copy-only and completed reels rerender only the affected outro layer over the cached body. |
+| DST-003 | A primary account could not be safely replaced as a reel/series operation. | Removing a channel risked either deleting a global connection or losing the exact media that belongs to another destination. | A primary promotion has an explicit keep/reclaim decision and reel/series scope. Keeping demotes the old primary with its output; reclaiming deletes only that reel/series account media from S3. Connected OAuth/account records are never deleted. |
+| RET-001 | Manually pasted or replanned Reddit stories did not always have a durable Story document. Deleting their Reel could make the same source eligible again. | Browse or a pasted seed URL could resurrect a story that had already been produced. | Planning records source usage and deletion backfills it before reclaiming media. `Story.used` survives Reel deletion and is distinct from clearable Operations diagnostics; browse and source resolution continue to reject the used seed/premise. |
+
+### Follow-up regression requirements
+
+1. Verify `primary`, `inheriting`, and `all` question regeneration with ready
+   YouTube and Instagram outputs, both before and after first render.
+2. Promote an existing ready extra to primary, then publish both accounts;
+   provider inputs must remain tied to their exact channel-specific files.
+3. Promote a new connected account with `keep` and then `remove`, for both a
+   single reel and a multipart series; assert that the only deleted keys belong
+   to the former primary within the requested scope.
+4. Delete an old manually pasted Reddit reel and assert that its S3 assets are
+   reclaimed, its Reel disappears, its `Story.used` history remains, and the
+   source form reports it unavailable.
+
 ## Open reliability and architecture findings
 
 ### Critical decisions needed
