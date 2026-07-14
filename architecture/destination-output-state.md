@@ -165,7 +165,7 @@ review/production.
 | Change shared story, scene, motion, gameplay, caption, voice, or title-card data | Canonical final is cleared | Every extra final is cleared and marked `pending`; only outro audio that remains valid is retained | Blocked for every affected account until the correct rebuild finishes |
 | Save an image/caption draft with extra destinations | Fresh primary preview is saved, then an outro-only job is queued | Old extras are cleared before the job; the job recreates each channel's final from the fresh body | Extras remain blocked during the queue run |
 | Promote a revoice variant | The raw variant becomes the shared body, not a final output | Existing finals and outro audio are cleared; an outro-only job rebuilds every channel final | Blocked during the queue run; raw voice variants cannot be published |
-| Remove extra destination | Primary untouched | Its output and outro audio are deleted from S3, then the record is removed | No longer selectable |
+| Remove extra destination | Primary untouched | Confirmation states the recorded asset count; its output/audio receive S3 DELETE requests, then the record is removed | No longer selectable; Studio and Operations report deleted/skipped/failed cleanup counts |
 | Promote a new primary and keep old | New primary receives its exact existing output if it was an extra; otherwise it is pending | Former primary becomes an extra with its exact output/audio | Each destination remains eligible only for its own ready output |
 | Promote a new primary and reclaim old | New primary receives its exact existing output if it was an extra; otherwise it is pending | Former primary's reel/series media is deleted; connected account remains intact | Former primary is no longer selectable for that reel/story |
 | Destination outro failure | Primary/existing ready outputs remain stored | Failing extra is marked `failed` with an error; the overall produce job fails instead of emitting a body-only fallback | Blocked |
@@ -183,6 +183,9 @@ review/production.
 8. Removing a reel reclaims its media but must first retain a durable used-story
    record. Story history is not Operations telemetry and is not removed by the
    Operations log cleanup controls.
+9. Removing an extra destination is a confirmed destructive action. Its result
+   includes an S3 cleanup summary and records `outro.destination_removed`; a
+   failed best-effort delete additionally has its own Operations warning.
 
 ## Current limitation to remove next
 

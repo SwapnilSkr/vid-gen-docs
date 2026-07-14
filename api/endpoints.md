@@ -172,6 +172,15 @@ Responses use the shape:
     selected reel or series is reclaimed from S3. Neither choice deletes or
     disconnects the globally connected social account.
 
+- `DELETE /api/reels/:id/destinations/:destId`
+  - Removes one extra channel from this reel only; it never disconnects the
+    global social account.
+  - Returns the updated reel plus `{ cleanup: { requested, deleted, skipped,
+    failed } }` for its recorded final video/outro audio. `deleted` means the
+    idempotent S3 DELETE request succeeded; any failure also emits a durable
+    `s3.superseded_asset_delete_failed` warning and an
+    `outro.destination_removed` Operations event.
+
 - `POST /api/reels/:id/review/thumbnail/frame`
   - JSON body: `{ atSeconds }` — extracts that frame from the rendered video
     (`reel.outputUrl`), uploads it, and sets it as the review thumbnail
